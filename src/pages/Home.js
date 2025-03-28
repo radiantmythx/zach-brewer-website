@@ -37,6 +37,10 @@ function Home() {
                   1500,
                   'Tech Enthusiast 🌐',
                   1500,
+                  'Game Developer 🎮',
+                  1500,
+                  'Musician, Composer, Producer 🎵',
+                  1500,
                 ]}
                 loop={Infinity}
                 wrapper="span"
@@ -54,7 +58,7 @@ function Home() {
           <a href="https://www.linkedin.com/in/zachary-brewer-88653269" target="_blank" rel="noopener noreferrer">
             <LinkedIn fontSize="large" />
           </a>
-          <a href="mailto:zachbrewer@zachbrewer.com">
+          <a href="mailto:zachary.brewer.spammyass@gmail.com">
             <Email fontSize="large" />
           </a>
         </Stack>

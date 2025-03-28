@@ -7,6 +7,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -27,13 +29,13 @@ function Footer({ toggleTheme }) {
       <Typography variant="body2" sx={{ marginBottom: 2 }}>
         © {new Date().getFullYear()} Zachary Brewer. All rights reserved.
       </Typography>
-      
     </Box>
   );
 }
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const lightTheme = createTheme({
     palette: {
@@ -57,6 +59,14 @@ function App() {
     setDarkMode((prevMode) => !prevMode);
   };
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
       <CssBaseline />
@@ -64,7 +74,6 @@ function App() {
         <div className="App">
           <AppBar position="sticky" color="primary" elevation={4}>
             <Toolbar>
-            
               <Button color="inherit" component={Link} to="/">Home</Button>
               <Button color="inherit" component={Link} to="/about">About</Button>
               <Button color="inherit" component={Link} to="/projects">Projects</Button>
@@ -72,9 +81,30 @@ function App() {
               {/* Spacer to push the theme toggle button to the right */}
               <Box sx={{ flexGrow: 1 }} />
 
-                <Button variant="inherit" onClick={toggleTheme}>
-                  Toggle Theme
-                </Button>
+              {/* Applications Dropdown */}
+              <Button
+                color="inherit"
+                onClick={handleMenuOpen}
+              >
+                Applications
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem
+                  component={Link}
+                  to="/applications/diceroller"
+                  onClick={handleMenuClose}
+                >
+                  Dice Rolling Simulator (Desktop)
+                </MenuItem>
+              </Menu>
+
+              <Button variant="inherit" onClick={toggleTheme}>
+                Toggle Theme
+              </Button>
             </Toolbar>
           </AppBar>
 
@@ -83,6 +113,18 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/contact" element={<Contact />} />
+            <Route
+              path="/applications/diceroller"
+              element={
+                <Box sx={{ height: '100vh', width: '100%' }}>
+                  <iframe
+                    src="/dice-roller-app/DiceRoller.html"
+                    title="Dice Roller Simulator"
+                    style={{ border: 'none', width: '100%', height: '100%' }}
+                  />
+                </Box>
+              }
+            />
           </Routes>
 
           <Footer toggleTheme={toggleTheme} />
