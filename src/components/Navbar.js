@@ -7,6 +7,7 @@ function Navbar({ toggleTheme }) {
   const links = [
     { to: '/', label: 'Home' },
     { to: '/playground', label: 'Playground' },
+    { to: '/components', label: 'Components' },
     { to: '/about', label: 'About' },
     { to: '/projects', label: 'Projects' },
     { to: '/contact', label: 'Contact' },

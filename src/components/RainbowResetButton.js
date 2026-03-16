@@ -29,53 +29,125 @@ function hslString(h, s, l, a = 1) {
     return `hsla(${Math.round(h)} ${Math.round(s)}% ${Math.round(l)}% / ${a})`;
 }
 
-export default function RainbowButton({ children, className = '', pulses = 1, pulseSize = 1, fadeTime = 0.5, ...rest }) {
+export default function RainbowResetButton({ children, className = '', pulses = 1, pulseSize = 1, fadeTime = 0.5, bgAlpha = 0, borderAlpha = 1, textRainbow = false, ...rest }) {
     const ref = useRef();
-    const bgRef = useRef();
     const timers = useRef([]);
     const tRef = useRef(0);
     const targetPos = useRef({ x: 0.5, y: 0.5 });
     const displayPos = useRef({ x: 0.5, y: 0.5 });
-    const [hover, setHover] = useState(false);
     const [clicked, setClicked] = useState(false);
 
-    // brighter, more vivid base gradient colors
     const baseColors = ['#ff007f', '#ff8a00', '#00fff6', '#7a2cff', '#ff007f'];
+    const ringWidth = 1; // px — keep ring a consistent 1px
 
-    // compute complementary colors for border-image
+    // compute complementary colors like RainbowButton so the ring matches
     const compColors = baseColors.map((hex) => {
         const { r, g, b } = hexToRgb(hex);
         const { h, s, l } = rgbToHsl(r, g, b);
         const compH = (h + 180) % 360;
         return hslString(compH, Math.max(60, s), Math.min(65, l + 5));
     });
+    const svgRingRef = useRef(null);
 
     useEffect(() => {
         let raf = null;
         function step() {
-            tRef.current += 0.008; // slow, smooth rotation
-
-            // smooth position lerp
+            tRef.current += 0.008;
             displayPos.current.x += (targetPos.current.x - displayPos.current.x) * 0.18;
             displayPos.current.y += (targetPos.current.y - displayPos.current.y) * 0.18;
-
-            // update DOM directly for smoothness
-            if (bgRef.current) {
-                const px = (displayPos.current.x - 0.5) * 12;
-                const py = (displayPos.current.y - 0.5) * 12;
-                bgRef.current.style.transform = `translate3d(${px}px, ${py}px,0)`;
+            if (ref.current) {
                 const hueShift = Math.floor((tRef.current * 60) % 360);
-                bgRef.current.style.backgroundImage = `conic-gradient(from ${hueShift}deg, ${baseColors.join(',')})`;
-            }
+                // ensure outer element box sizing and radius
+                ref.current.style.boxSizing = 'border-box';
+                ref.current.style.background = 'transparent';
+                ref.current.style.borderRadius = '0.5rem';
 
+                // create or update an SVG ring overlay (rounded 1px stroke) so center stays transparent
+                const rect = ref.current.getBoundingClientRect();
+                let svg = svgRingRef.current;
+                const id = `rbg-reset-ring-${String(ref.current ? ref.current.dataset.rbgResetId : '') || '0'}`;
+                if (!svg) {
+                    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('aria-hidden', 'true');
+                    svg.style.position = 'absolute';
+                    svg.style.left = '0';
+                    svg.style.top = '0';
+                    svg.style.width = '100%';
+                    svg.style.height = '100%';
+                    svg.style.pointerEvents = 'none';
+                    svg.style.zIndex = '0';
+                    svgRingRef.current = svg;
+                    // prepend so it sits behind text but above background
+                    ref.current.insertBefore(svg, ref.current.firstChild);
+                }
+
+                const w = Math.max(1, Math.round(rect.width));
+                const h = Math.max(1, Math.round(rect.height));
+                svg.setAttribute('width', String(w));
+                svg.setAttribute('height', String(h));
+                svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+                // create defs/gradient and rect if missing
+                let grad = svg.querySelector('defs > linearGradient');
+                if (!grad) {
+                    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                    grad.setAttribute('id', id + '-grad');
+                    grad.setAttribute('x1', '0%');
+                    grad.setAttribute('y1', '0%');
+                    grad.setAttribute('x2', '100%');
+                    grad.setAttribute('y2', '0%');
+                    defs.appendChild(grad);
+                    svg.appendChild(defs);
+                }
+
+                // update gradient stops
+                while (grad.firstChild) grad.removeChild(grad.firstChild);
+                compColors.forEach((c, i) => {
+                    const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                    stop.setAttribute('offset', `${(i / (compColors.length - 1)) * 100}%`);
+                    stop.setAttribute('stop-color', c);
+                    grad.appendChild(stop);
+                });
+                grad.setAttribute('gradientTransform', `rotate(${hueShift})`);
+
+                let rectEl = svg.querySelector('rect.rbg-reset-ring');
+                if (!rectEl) {
+                    rectEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rectEl.classList.add('rbg-reset-ring');
+                    rectEl.setAttribute('fill', 'none');
+                    rectEl.setAttribute('stroke-linecap', 'round');
+                    rectEl.setAttribute('stroke-linejoin', 'round');
+                    svg.appendChild(rectEl);
+                }
+
+                const strokeW = Math.max(1, ringWidth);
+                const inset = strokeW / 2;
+                const rx = Math.max(0, Math.min(12, parseFloat(window.getComputedStyle(ref.current).borderRadius) || 8));
+                rectEl.setAttribute('x', String(inset));
+                rectEl.setAttribute('y', String(inset));
+                rectEl.setAttribute('width', String(Math.max(0, w - strokeW)));
+                rectEl.setAttribute('height', String(Math.max(0, h - strokeW)));
+                rectEl.setAttribute('rx', String(rx));
+                rectEl.setAttribute('ry', String(rx));
+                rectEl.setAttribute('stroke-width', String(strokeW));
+                rectEl.setAttribute('stroke', `url(#${id}-grad)`);
+            }
             raf = requestAnimationFrame(step);
         }
         raf = requestAnimationFrame(step);
         return () => cancelAnimationFrame(raf);
-    }, []);
+    }, [borderAlpha]);
 
     useEffect(() => {
-        return () => timers.current.forEach((id) => clearTimeout(id));
+        return () => {
+            timers.current.forEach((id) => clearTimeout(id));
+            try {
+                if (svgRingRef.current && svgRingRef.current.parentNode) svgRingRef.current.remove();
+            } catch (err) {
+                // ignore
+            }
+        };
     }, []);
 
     function handleMove(e) {
@@ -84,40 +156,25 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
     }
 
     function handleClick(e) {
-        // clear previous to ensure consistent pulse
+        // clear pending timers
         timers.current.forEach((id) => clearTimeout(id));
         timers.current.length = 0;
-
-        // remove any existing global pulse svgs to avoid burn on spam click
+        // remove any existing pulse svgs immediately to avoid "burn" on spam click
         try {
-            document.querySelectorAll('svg[data-rbg]').forEach((el) => el.remove());
+            document.querySelectorAll('svg[data-rbg-rst]').forEach((el) => el.remove());
         } catch (err) {
-            // ignore
+            // ignore in non-browser environments
         }
-
         setClicked(true);
-        // smaller/faster pulse: clear after 360ms
         const t1 = setTimeout(() => setClicked(false), 360);
         timers.current.push(t1);
-
-        // create global outward pulse
         createBodyPulse();
-
         if (rest.onClick) rest.onClick(e);
     }
 
-    const hueShift = Math.floor((tRef.current * 60) % 360);
-
-    // choose complementary color nearest to current mouse x position (use displayPos for smoothness)
-    const idx = Math.min(baseColors.length - 1, Math.max(0, Math.floor(displayPos.current.x * baseColors.length)));
-    const prePulseColor = compColors[idx];
-
-    // Use outer button as a 1px gradient ring by applying the gradient as background and 1px padding.
-    // Inner container is clipped and rounded to create a true rounded border effect.
     const outerStyle = {
-        padding: 1,
+        padding: `${ringWidth}px`,
         borderRadius: '0.5rem',
-        background: `conic-gradient(from ${hueShift}deg, ${compColors.join(',')})`,
         WebkitTapHighlightColor: 'transparent',
     };
 
@@ -129,10 +186,10 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
         paddingRight: '1rem',
         paddingTop: '0.5rem',
         paddingBottom: '0.5rem',
-        borderRadius: '0.375rem',
+        borderRadius: `calc(0.5rem - ${ringWidth}px)`,
         position: 'relative',
         overflow: 'hidden',
-        background: 'transparent',
+        background: bgAlpha ? `rgba(255,255,255,${bgAlpha})` : 'transparent',
     };
 
     function createBodyPulse() {
@@ -146,14 +203,14 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
 
         for (let p = 0; p < Math.max(1, Math.floor(pulses)); p++) {
             const svg = document.createElementNS(svgNS, 'svg');
-            const id = `rbg-${Date.now()}-${p}`;
+            const id = `rbg-rst-${Date.now()}-${p}`;
+            svg.setAttribute('data-rbg-rst', id);
+            svg.classList.add('rbg-rst-pulse');
             const w = rect.width;
             const h = rect.height;
             const strokeW = Math.max(1, Math.round(pulseSize));
 
             svg.setAttribute('width', String(w));
-            svg.setAttribute('data-rbg', id);
-            svg.classList.add('rbg-pulse');
             svg.setAttribute('height', String(h));
             svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
             svg.style.position = 'fixed';
@@ -174,10 +231,13 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
             grad.setAttribute('x2', '100%');
             grad.setAttribute('y2', '0%');
 
-            compColors.forEach((c, i) => {
+            baseColors.forEach((hex, i) => {
+                const { r, g, b } = hexToRgb(hex);
+                const { h, s, l } = rgbToHsl(r, g, b);
+                const color = hslString((h + 180) % 360, Math.max(60, s), Math.min(65, l + 5), borderAlpha);
                 const stop = document.createElementNS(svgNS, 'stop');
-                stop.setAttribute('offset', `${(i / (compColors.length - 1)) * 100}%`);
-                stop.setAttribute('stop-color', c.replace(/\)/, ' / 1)'));
+                stop.setAttribute('offset', `${(i / (baseColors.length - 1)) * 100}%`);
+                stop.setAttribute('stop-color', color);
                 grad.appendChild(stop);
             });
 
@@ -204,17 +264,14 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
             svg.appendChild(rectEl);
             document.body.appendChild(svg);
 
-            // stagger the reveal slightly per pulse for subtle multi-ring effect
             const delay = p * stagger;
             const revealId = setTimeout(() => {
                 svg.style.opacity = '1';
-                // small outward scale per pulse
                 const expandScale = 1 + (0.01 * (p + 1) * Math.max(1, pulseSize));
                 svg.style.transform = `translate(-50%,-50%) scale(${expandScale})`;
                 rectEl.style.filter = 'blur(6px)';
             }, delay);
 
-            // fade after fadeMs + delay
             const fadeId = setTimeout(() => {
                 rectEl.setAttribute('opacity', '0');
                 svg.style.opacity = '0';
@@ -230,72 +287,32 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
         }
     }
 
+    const textColor = `rgba(255,255,255,${Math.min(1, Math.max(0, 0.95 - bgAlpha))})`;
+    const hueShiftRender = Math.floor((tRef.current * 60) % 360);
+    const textStyle = textRainbow
+        ? {
+              backgroundImage: `conic-gradient(from ${hueShiftRender}deg, ${baseColors.join(',')})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+          }
+        : { color: textColor };
+
     return (
         <button
             {...rest}
             ref={ref}
             onMouseMove={handleMove}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
             onClick={handleClick}
             className={`relative inline-flex focus:outline-none transition-all duration-200 ${className}`}
             style={outerStyle}
         >
-            {/* outward pulse now created on document.body so it radiates outside the button */}
-
             <span style={innerStyle}>
-                {/* multicolor blurred background (clipped by inner rounded radius) */}
-                <span
-                    aria-hidden
-                    ref={bgRef}
-                    style={{
-                        position: 'absolute',
-                        inset: 0,
-                        transform: `translate3d(0px, 0px,0)`,
-                        transition: hover ? 'transform 90ms linear' : 'transform 400ms ease',
-                        backgroundImage: `conic-gradient(from ${hueShift}deg, ${baseColors.join(',')})`,
-                        filter: 'blur(12px) saturate(140%)',
-                        opacity: 0.98,
-                        zIndex: 0,
-                    }}
-                />
+                {/* background gradient removed from inner area so interior stays transparent; border is painted on the outer button element */}
 
-                {/* shimmer overlay */}
-                <span
-                    aria-hidden
-                    style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02), rgba(255,255,255,0.06))',
-                        mixBlendMode: 'overlay',
-                        pointerEvents: 'none',
-                        animation: 'shimmer 2200ms linear infinite',
-                        opacity: 0.9,
-                        zIndex: 1,
-                    }}
-                />
-
-                {/* hover pre-pulse glow (inside outer ring) */}
-                <span
-                    aria-hidden
-                    style={{
-                        position: 'absolute',
-                        inset: -4,
-                        borderRadius: '0.375rem',
-                        background: `conic-gradient(from ${hueShift}deg, ${compColors.join(',')})`,
-                        filter: `blur(${hover ? 18 : 6}px) saturate(140%)`,
-                        opacity: hover ? 0.9 : 0.14,
-                        transition: 'opacity 180ms ease, filter 180ms ease',
-                        pointerEvents: 'none',
-                        zIndex: 0,
-                    }}
-                />
-
-                <span className="relative z-10 font-semibold text-white select-none" style={{ pointerEvents: 'none' }}>
+                <span className="relative z-10 font-semibold select-none" style={{ pointerEvents: 'none', ...textStyle }}>
                     {children}
                 </span>
 
-                {/* click pulse (consistent) */}
                 <span
                     aria-hidden
                     style={{
@@ -306,7 +323,7 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
                         width: clicked ? '240%' : '0%',
                         height: clicked ? '240%' : '0%',
                         borderRadius: '50%',
-                        background: `radial-gradient(circle, ${prePulseColor}, rgba(255,255,255,0))`,
+                        background: `radial-gradient(circle, rgba(255,255,255,0.08), rgba(255,255,255,0))`,
                         transition: 'all 420ms cubic-bezier(.2,.8,.2,1)',
                         pointerEvents: 'none',
                         zIndex: 2,
@@ -314,6 +331,6 @@ export default function RainbowButton({ children, className = '', pulses = 1, pu
                     }}
                 />
             </span>
-        </button>
+        </button >
     );
 }

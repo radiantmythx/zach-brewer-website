@@ -10,51 +10,18 @@ export default function PlaygroundIndex() {
     return (
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
             <h1 className="text-3xl font-semibold">Playground</h1>
-            <p className="mt-2 text-gray-700 dark:text-gray-300">A collection of small components and visual themes you can copy into your projects.</p>
+            <p className="mt-2 text-gray-700 dark:text-gray-300">Playable demos and small apps — click a card to open an experiment.</p>
 
-            <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                    <h3 className="font-semibold">Rainbow Button</h3>
-                    <div className="mt-3">
-                        <RainbowButton>Click Me</RainbowButton>
-                    </div>
-                    <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import RainbowButton from '.../components/RainbowButton'\n\n<RainbowButton>Click me</RainbowButton>`}</pre>
+            <div className="grid md:grid-cols-2 gap-4 mt-6">
+                <Link to="/playground/tictactoe" className="block p-4 rounded-lg border border-white/6 bg-gradient-to-b from-gray-900/70 to-gray-900/50 hover:scale-105 transform transition">
+                    <h3 className="text-lg font-semibold">Tic-Tac-Toe</h3>
+                    <p className="mt-2 text-sm text-gray-400">Play against a simple AI. Uses the rainbow panels and buttons.</p>
+                </Link>
+
+                <div className="block p-4 rounded-lg border border-white/6 bg-gradient-to-b from-gray-900/10 to-gray-900/0 opacity-70">
+                    <h3 className="text-lg font-semibold">Coming Soon</h3>
+                    <p className="mt-2 text-sm text-gray-500">More playground apps will appear here.</p>
                 </div>
-
-                <div>
-                    <h3 className="font-semibold">Space Button</h3>
-                    <div className="mt-3">
-                        <SpaceButton>Launch</SpaceButton>
-                    </div>
-                    <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import SpaceButton from '.../components/SpaceButton'\n\n<SpaceButton>Launch</SpaceButton>`}</pre>
-                </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                    <h3 className="font-semibold">Rainbow Panel</h3>
-                    <div className="mt-3">
-                        <RainbowPanel>
-                            <p>Example content inside a glowing rainbow frame.</p>
-                        </RainbowPanel>
-                    </div>
-                    <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import RainbowPanel from '.../components/RainbowPanel'\n\n<RainbowPanel>Content</RainbowPanel>`}</pre>
-                </div>
-
-                <div>
-                    <h3 className="font-semibold">Space Panel</h3>
-                    <div className="mt-3">
-                        <SpacePanel>
-                            <p>Example content inside a space-themed panel.</p>
-                        </SpacePanel>
-                    </div>
-                    <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import SpacePanel from '.../components/SpacePanel'\n\n<SpacePanel>Content</SpacePanel>`}</pre>
-                </div>
-            </div>
-
-            <div className="pt-2">
-                <h3 className="font-semibold">More</h3>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Open-source snippets and more examples to copy into your projects. See other playground experiments <Link to="/playground/dice" className="text-blue-600 hover:underline">here</Link>.</p>
             </div>
         </div>
     );
