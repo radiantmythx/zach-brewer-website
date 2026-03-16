@@ -1,29 +1,20 @@
-import React, { memo } from 'react';
-import Typical from 'react-typical';
-
-const MemoizedTypical = memo(() => (
-  <Typical
-    steps={['Automation Engineer 💻', 1500, 'Software Developer 🚀', 1500, 'Tech Enthusiast 🌐', 1500, 'Game Developer 🎮', 1500, 'Musician, Composer, Producer 🎵', 1500]}
-    loop={Infinity}
-    wrapper="span"
-  />
-));
+import React from 'react';
 
 function Home() {
   return (
     <div className="px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <section className="relative text-center mt-8 p-8 rounded-2xl shadow-2xl bg-gradient-to-r from-white/60 to-sky-50/60 dark:from-black/50 dark:to-gray-800/50 backdrop-blur-md border border-white/30">
+        <section className="relative text-center mt-8 p-8 rounded-2xl panel">
           <img src="/sitephoto.png" alt="Zachary Brewer" className="w-28 h-28 rounded-full mx-auto mb-4 ring-4 ring-white/60 dark:ring-black/60" />
           <h1 className="text-4xl font-extrabold tracking-tight">Zachary Brewer</h1>
           <div className="mt-3 text-xl text-gray-700 dark:text-gray-300 min-w-[220px] mx-auto">
-            <MemoizedTypical />
+            <span className="font-medium">Automation Engineer 💻 · Software Developer 🚀 · Tech Enthusiast 🌐</span>
           </div>
           <p className="mt-4 text-gray-700 dark:text-gray-300">Welcome to my portfolio — concise, fast, and mobile-first.</p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-3 mt-6">
-            <a href="/projects" className="inline-block px-6 py-3 rounded-full text-white bg-gradient-to-r from-brand-500 to-teal-400 shadow-lg transform transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-brand-300">View Projects</a>
-            <a href="/contact" className="inline-block px-6 py-3 rounded-full text-brand-600 bg-white/70 dark:bg-white/5 dark:text-white border border-white/20 backdrop-blur-sm hover:brightness-105 transition">Contact Me</a>
+            <a href="/projects" className="inline-block px-6 py-3 rounded-full text-white bg-gradient-to-r from-indigo-600 to-teal-400 shadow-lg transform transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300">View Projects</a>
+            <a href="/contact" className="inline-block px-6 py-3 rounded-full text-indigo-700 bg-white/80 dark:bg-white/5 dark:text-white border border-white/20 backdrop-blur-sm hover:brightness-95 transition">Contact Me</a>
           </div>
 
           <div className="flex justify-center gap-6 mt-6 text-gray-700 dark:text-gray-200">

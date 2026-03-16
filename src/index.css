@@ -10,7 +10,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: white;
 }
 
 code {
@@ -53,4 +52,32 @@ body,
 
 .bloom {
   animation: bloom 6s ease-in-out infinite;
+}
+
+/* Panel utility for consistent modern cards/panels */
+.panel {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.panel:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.14);
+}
+
+/* Slight dark-mode variant when .dark exists on root */
+:root.dark .panel,
+.dark .panel {
+  background: rgba(8, 10, 15, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Small nav bloom helper */
+.nav-bloom {
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.08);
 }

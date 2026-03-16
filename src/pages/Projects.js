@@ -7,12 +7,12 @@ function Projects() {
             <p className="mt-4 text-gray-700 dark:text-gray-300">A selection of notable work and experiments. Click any card to learn more.</p>
 
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <article className="p-4 rounded-xl bg-white shadow-lg dark:bg-gray-800 hover:scale-105 transform transition">
+                <article className="p-4 rounded-xl panel">
                     <h3 className="text-xl font-semibold">Personal Website</h3>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">This portfolio, rebuilt with a focus on performance and mobile-first design.</p>
                 </article>
 
-                <article className="p-4 rounded-xl bg-white shadow-lg dark:bg-gray-800 hover:scale-105 transform transition">
+                <article className="p-4 rounded-xl panel">
                     <h3 className="text-xl font-semibold">Tooling & Experiments</h3>
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Playground experiments and small utilities. Many are lazy-loaded to keep the bundle small.</p>
                 </article>

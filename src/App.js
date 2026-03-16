@@ -19,7 +19,7 @@ function App() {
 
   return (
     <Router>
-      <div className={darkMode ? 'dark min-h-screen' : 'min-h-screen'}>
+      <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
         <Navbar toggleTheme={toggleTheme} />
 
         <MainLayout>
