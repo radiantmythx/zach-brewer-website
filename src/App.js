@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+import { ThemeProvider, useTheme } from './theme/ThemeContext';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -12,14 +13,17 @@ import Projects from './pages/Projects';
 import Contact from './pages/Contact';
 import PlaygroundIndex from './pages/PlaygroundIndex';
 
-function App() {
-  const [darkMode, setDarkMode] = useState(true);
+import SpaceBackground from './components/backgrounds/SpaceBackground';
+import RainbowBackground from './components/backgrounds/RainbowBackground';
 
-  const toggleTheme = () => setDarkMode((prevMode) => !prevMode);
+function AppInner() {
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <Router>
-      <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+      <div className={`min-h-screen transition-colors duration-300 ${theme === 'space' ? 'dark text-white bg-gray-900' : 'text-gray-900 bg-white'}`}>
+        {theme === 'space' ? <SpaceBackground /> : <RainbowBackground />}
+
         <Navbar toggleTheme={toggleTheme} />
 
         <MainLayout>
@@ -38,4 +42,10 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppInner />
+    </ThemeProvider>
+  );
+}
