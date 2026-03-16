@@ -6,19 +6,19 @@ import Box from '@mui/material/Box';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MainLayout from './layouts/MainLayout';
 import { lightTheme, darkTheme } from './theme';
 
 import Home from './pages/Home';
 import About from './pages/About';
 import Projects from './pages/Projects';
 import Contact from './pages/Contact';
+import PlaygroundIndex from './pages/PlaygroundIndex';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
 
-  const toggleTheme = () => {
-    setDarkMode((prevMode) => !prevMode);
-  };
+  const toggleTheme = () => setDarkMode((prevMode) => !prevMode);
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -27,26 +27,17 @@ function App() {
         <div className="App">
           <Navbar toggleTheme={toggleTheme} />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route
-              path="/applications/diceroller"
-              element={
-                <Box sx={{ height: '100vh', width: '100%' }}>
-                  <iframe
-                    src="/dice-roller-app/DiceRoller.html"
-                    title="Dice Roller Simulator"
-                    style={{ border: 'none', width: '100%', height: '100%' }}
-                  />
-                </Box>
-              }
-            />
-          </Routes>
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/playground" element={<PlaygroundIndex />} />
+            </Routes>
+          </MainLayout>
 
-          <Footer toggleTheme={toggleTheme} />
+          <Footer />
         </div>
       </Router>
     </ThemeProvider>
