@@ -1,14 +1,11 @@
 import React from 'react';
-import { Container, Typography } from '@mui/material';
 
 function About() {
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" sx={{ marginTop: 4 }}>About Me</Typography>
-      <Typography variant="body1" sx={{ marginTop: 2 }}>
-        I'm an Automation Engineer with a passion for clean code, smart solutions, and elegant design.
-      </Typography>
-    </Container>
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <h1 className="text-3xl font-semibold mt-4">About Me</h1>
+      <p className="mt-4 text-gray-700 dark:text-gray-300">I'm an Automation Engineer with a passion for clean code, smart solutions, and elegant design.</p>
+    </div>
   );
 }
 

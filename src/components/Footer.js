@@ -1,19 +1,11 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
 
 export default function Footer() {
   return (
-    <Box
-      component="footer"
-      sx={{
-        textAlign: 'center',
-        padding: 3,
-        backgroundColor: 'background.paper',
-        color: 'text.primary',
-        marginTop: 8,
-      }}
-    >
-      <Typography variant="body2">© {new Date().getFullYear()} Zachary Brewer. All rights reserved.</Typography>
-    </Box>
+    <footer className="mt-12 bg-gradient-to-r from-white/30 to-sky-50/20 dark:from-black/20 dark:to-gray-900/40 text-center text-gray-600 py-6">
+      <div className="max-w-7xl mx-auto px-4">
+        <p className="text-sm">© {new Date().getFullYear()} Zachary Brewer. All rights reserved.</p>
+      </div>
+    </footer>
   );
 }

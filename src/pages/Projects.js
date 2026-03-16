@@ -1,25 +1,26 @@
 import React from 'react';
-import { Container, Typography, Box } from '@mui/material';
-
-import GitHubCalendar from 'react-github-calendar';
-
-
 
 function Projects() {
     return (
-        <Container maxWidth="md">
-            <Typography variant="h4" sx={{ marginTop: 4 }}>My Projects</Typography>
-            <Typography variant="body1" sx={{ marginTop: 2 }}>
-                Coming soon: A showcase of public libraries, personal tools, and tutorials I've built or contributed to.
-            </Typography>
-            <Typography variant="h6">Personal Github Heatmap (Previous Year)</Typography>
-            <img
-                src="https://ghchart.rshah.org/radiantmythx"
-                alt="GitHub Contributions"
-                style={{ width: '100%', maxWidth: '600px' }}
-            />
-        </Container>
+        <div className="max-w-4xl mx-auto px-4 py-6">
+            <h1 className="text-3xl font-semibold mt-4">My Projects</h1>
+            <p className="mt-4 text-gray-700 dark:text-gray-300">A selection of notable work and experiments. Click any card to learn more.</p>
 
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <article className="p-4 rounded-xl bg-white shadow-lg dark:bg-gray-800 hover:scale-105 transform transition">
+                    <h3 className="text-xl font-semibold">Personal Website</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">This portfolio, rebuilt with a focus on performance and mobile-first design.</p>
+                </article>
+
+                <article className="p-4 rounded-xl bg-white shadow-lg dark:bg-gray-800 hover:scale-105 transform transition">
+                    <h3 className="text-xl font-semibold">Tooling & Experiments</h3>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Playground experiments and small utilities. Many are lazy-loaded to keep the bundle small.</p>
+                </article>
+            </div>
+
+            <h2 className="mt-8 text-xl font-medium">Personal Github Heatmap (Previous Year)</h2>
+            <img src="https://ghchart.rshah.org/radiantmythx" alt="GitHub Contributions" className="w-full max-w-xl mt-3 rounded-md shadow" />
+        </div>
     );
 }
 

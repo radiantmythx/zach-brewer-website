@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
+
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MainLayout from './layouts/MainLayout';
-import { lightTheme, darkTheme } from './theme';
 
 import Home from './pages/Home';
 import About from './pages/About';
@@ -21,26 +18,23 @@ function App() {
   const toggleTheme = () => setDarkMode((prevMode) => !prevMode);
 
   return (
-    <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <CssBaseline />
-      <Router>
-        <div className="App">
-          <Navbar toggleTheme={toggleTheme} />
+    <Router>
+      <div className={darkMode ? 'dark min-h-screen' : 'min-h-screen'}>
+        <Navbar toggleTheme={toggleTheme} />
 
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/playground" element={<PlaygroundIndex />} />
-            </Routes>
-          </MainLayout>
+        <MainLayout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/playground" element={<PlaygroundIndex />} />
+          </Routes>
+        </MainLayout>
 
-          <Footer />
-        </div>
-      </Router>
-    </ThemeProvider>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

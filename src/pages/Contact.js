@@ -1,14 +1,11 @@
 import React from 'react';
-import { Container, Typography } from '@mui/material';
 
 function Contact() {
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" sx={{ marginTop: 4 }}>Contact Me</Typography>
-      <Typography variant="body1" sx={{ marginTop: 2 }}>
-        Feel free to reach out via email or through my LinkedIn or GitHub profiles.
-      </Typography>
-    </Container>
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <h1 className="text-3xl font-semibold mt-4">Contact Me</h1>
+      <p className="mt-4 text-gray-700 dark:text-gray-300">Feel free to reach out via email or through my LinkedIn or GitHub profiles.</p>
+    </div>
   );
 }
 
