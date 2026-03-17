@@ -48,8 +48,8 @@ export default function Components() {
                     <div>
                         <h4 className="font-medium">Buttons</h4>
                         <div className="mt-3 flex items-center gap-3">
-                            <SpaceButton>Launch</SpaceButton>
-                            <ThemeButton theme="space" variant="border">Orbit</ThemeButton>
+                            <SpaceButton>Filled</SpaceButton>
+                            <SpaceButton variant="border">Border</SpaceButton>
                         </div>
                     </div>
 
