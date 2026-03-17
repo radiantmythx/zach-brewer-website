@@ -22,7 +22,7 @@ export function cloneBoard(b) {
 
 function inBounds(r, c) { return r >= 0 && r < 8 && c >= 0 && c < 8; }
 
-export function getMoves(board, isPlayer = true) {
+export function getMoves(board, isPlayer = true, forceCapture = true) {
     // returns array of {from:[r,c], to:[r,c], captures: [[r,c], ...]} moves
     const moves = [];
     const me = isPlayer ? 1 : -1;
@@ -52,7 +52,7 @@ export function getMoves(board, isPlayer = true) {
         }
     }
 
-    if (captures.length > 0) return captures;
+    if (captures.length > 0 && forceCapture) return captures;
 
     // non-captures
     for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
@@ -66,7 +66,9 @@ export function getMoves(board, isPlayer = true) {
             if (board[nr][nc] === 0) moves.push({ from: [r,c], to: [nr,nc], captures: [] });
         }
     }
-    return moves;
+    // if forceCapture was true and captures existed we'd have returned above.
+    // here return non-captures (or all moves when forceCapture is false)
+    return moves.concat(captures);
 }
 
 export function applyMove(board, move) {
