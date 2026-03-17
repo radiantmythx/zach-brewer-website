@@ -291,10 +291,10 @@ export default function RainbowResetButton({ children, className = '', pulses = 
     const hueShiftRender = Math.floor((tRef.current * 60) % 360);
     const textStyle = textRainbow
         ? {
-              backgroundImage: `conic-gradient(from ${hueShiftRender}deg, ${baseColors.join(',')})`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-          }
+            backgroundImage: `conic-gradient(from ${hueShiftRender}deg, ${baseColors.join(',')})`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+        }
         : { color: textColor };
 
     return (

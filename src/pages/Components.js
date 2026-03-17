@@ -6,6 +6,9 @@ import SpaceButton from '../components/SpaceButton';
 import RainbowPanel from '../components/RainbowPanel';
 import SpacePanel from '../components/SpacePanel';
 import RainbowResetButton from '../components/RainbowResetButton';
+import ThemeButton from '../components/themes/ThemeButton';
+import ThemePanel from '../components/themes/ThemePanel';
+import ThemeCard from '../components/themes/ThemeCard';
 
 export default function Components() {
     return (
@@ -39,6 +42,22 @@ export default function Components() {
                     </div>
                     <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import RainbowResetButton from '.../components/RainbowResetButton'\n\n<RainbowResetButton bgAlpha={0.04} borderAlpha={1}>Reset</RainbowResetButton>`}</pre>
                 </div>
+                <div>
+                    <h3 className="font-semibold">Themed Examples</h3>
+                    <div className="mt-3 space-y-3">
+                        <div className="flex items-center gap-3">
+                            <ThemeButton theme="fire">Flare</ThemeButton>
+                            <ThemeButton theme="water">Splash</ThemeButton>
+                            <ThemeButton theme="air">Breeze</ThemeButton>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <ThemeButton theme="earth">Root</ThemeButton>
+                            <ThemeButton theme="mirror">Reflect</ThemeButton>
+                            <ThemeButton theme="space">Orbit</ThemeButton>
+                        </div>
+                    </div>
+                    <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import ThemeButton from '.../components/themes/ThemeButton'\n\n<ThemeButton theme=\"fire\">Flare</ThemeButton>`}</pre>
+                </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -60,6 +79,33 @@ export default function Components() {
                         </SpacePanel>
                     </div>
                     <pre className="mt-3 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm overflow-auto">{`import SpacePanel from '.../components/SpacePanel'\n\n<SpacePanel>Content</SpacePanel>`}</pre>
+                </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                    <h3 className="font-semibold">Elemental Cards</h3>
+                    <div className="mt-3 space-y-3">
+                        <ThemeCard theme="fire" title="Fire Card">Hot content</ThemeCard>
+                        <ThemeCard theme="water" title="Water Card">Cool content</ThemeCard>
+                        <ThemeCard theme="earth" title="Earth Card">Grounded content</ThemeCard>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="font-semibold">Air / Mirror</h3>
+                    <div className="mt-3 space-y-3">
+                        <ThemeCard theme="air" title="Air Card">Light content</ThemeCard>
+                        <ThemeCard theme="mirror" title="Mirror Card">Reflective content</ThemeCard>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="font-semibold">Space / Rainbow</h3>
+                    <div className="mt-3 space-y-3">
+                        <ThemeCard theme="space" title="Space Card">Cosmic content</ThemeCard>
+                        <ThemeCard theme="rainbow" title="Rainbow Card">Spectral content</ThemeCard>
+                    </div>
                 </div>
             </div>
 
