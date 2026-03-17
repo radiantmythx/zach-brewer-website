@@ -14,6 +14,7 @@ import Contact from './pages/Contact';
 import PlaygroundIndex from './pages/PlaygroundIndex';
 import Components from './pages/Components';
 import TicTacToe from './pages/playground/TicTacToe';
+import Checkers from './pages/playground/Checkers';
 
 import SpaceBackground from './components/backgrounds/SpaceBackground';
 import RainbowBackground from './components/backgrounds/RainbowBackground';
@@ -37,6 +38,7 @@ function AppInner() {
             <Route path="/playground" element={<PlaygroundIndex />} />
             <Route path="/components" element={<Components />} />
             <Route path="/playground/tictactoe" element={<TicTacToe />} />
+            <Route path="/playground/checkers" element={<Checkers />} />
           </Routes>
         </MainLayout>
 

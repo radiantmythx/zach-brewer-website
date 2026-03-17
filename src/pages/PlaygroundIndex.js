@@ -5,7 +5,7 @@ import RainbowButton from '../components/RainbowButton';
 import SpaceButton from '../components/SpaceButton';
 import RainbowPanel from '../components/RainbowPanel';
 import SpacePanel from '../components/SpacePanel';
-import Checkers from './playground/Checkers';
+// Checkers is available as a separate playground route
 
 export default function PlaygroundIndex() {
     return (
@@ -19,13 +19,10 @@ export default function PlaygroundIndex() {
                     <p className="mt-2 text-sm text-gray-400">Play against a simple AI. Uses the rainbow panels and buttons.</p>
                 </Link>
 
-                <div className="block p-4 rounded-lg border border-white/6 bg-gradient-to-b from-gray-900/10 to-gray-900/0 opacity-70">
-                    <h3 className="text-lg font-semibold">Coming Soon</h3>
-                    <p className="mt-2 text-sm text-gray-500">More playground apps will appear here.</p>
-                </div>
-                <div className="mt-6">
-                    <Checkers />
-                </div>
+                <Link to="/playground/checkers" className="block p-4 rounded-lg border border-white/6 bg-gradient-to-b from-gray-900/10 to-gray-900/0 hover:scale-105 transform transition">
+                    <h3 className="text-lg font-semibold">Checkers</h3>
+                    <p className="mt-2 text-sm text-gray-500">Play a basic game of Checkers against a simple AI.</p>
+                </Link>
             </div>
         </div>
     );
