@@ -74,10 +74,14 @@ export default function Checkers() {
             setTimeout(() => {
                 const move = aiChoose(board);
                 if (move) {
-                    animateAndApply(move, false);
+                    // animate AI move and then set turn back to player
+                    animateAndApply(move, 'player').then(() => {
+                        aiThinking.current = false;
+                    });
+                } else {
+                    aiThinking.current = false;
                 }
-                aiThinking.current = false;
-            }, 350);
+            }, 200);
         }
     }, [turn, board]);
 
@@ -111,22 +115,29 @@ export default function Checkers() {
         return el ? el.getBoundingClientRect() : null;
     }
 
-    function animateAndApply(move, switchTurn = true) {
+    function animateAndApply(move, nextTurn = 'ai') {
+        return new Promise((resolve) => {
         const from = move.from, to = move.to;
         const fromRect = getSquareRect(from[0], from[1]);
         const toRect = getSquareRect(to[0], to[1]);
         if (!fromRect || !toRect) {
             // fallback: immediate
             setBoard(b => applyMove(b, move));
-            if (switchTurn) setTurn('ai');
+            if (nextTurn) setTurn(nextTurn);
+            resolve();
             return;
         }
 
         const pieceVal = board[from[0]][from[1]];
         const floatEl = document.createElement('div');
         floatEl.style.position = 'fixed';
-        floatEl.style.left = `${fromRect.left + fromRect.width/2 - 20}px`;
-        floatEl.style.top = `${fromRect.top + fromRect.height/2 - 20}px`;
+        // position using left/top but we'll animate via transform for high-framerate
+        const startLeft = fromRect.left + fromRect.width/2 - 20;
+        const startTop = fromRect.top + fromRect.height/2 - 20;
+        const dx = (toRect.left + toRect.width/2 - 20) - startLeft;
+        const dy = (toRect.top + toRect.height/2 - 20) - startTop;
+        floatEl.style.left = `${startLeft}px`;
+        floatEl.style.top = `${startTop}px`;
         floatEl.style.width = '40px';
         floatEl.style.height = '40px';
         floatEl.style.borderRadius = '50%';
@@ -134,7 +145,9 @@ export default function Checkers() {
         floatEl.style.display = 'flex';
         floatEl.style.alignItems = 'center';
         floatEl.style.justifyContent = 'center';
-        floatEl.style.transition = 'transform 380ms cubic-bezier(.2,.9,.2,1), left 380ms cubic-bezier(.2,.9,.2,1), top 380ms cubic-bezier(.2,.9,.2,1), opacity 380ms ease';
+        const dur = 340;
+        floatEl.style.transition = `transform ${dur}ms cubic-bezier(.2,.9,.2,1), opacity ${dur}ms ease`;
+        floatEl.style.willChange = 'transform, opacity';
         if (pieceVal > 0) {
             floatEl.style.background = 'radial-gradient(circle at 30% 30%, #4b5563, #111827)';
         } else {
@@ -145,17 +158,25 @@ export default function Checkers() {
 
         // small delay to allow paint
         requestAnimationFrame(() => {
-            floatEl.style.left = `${toRect.left + toRect.width/2 - 20}px`;
-            floatEl.style.top = `${toRect.top + toRect.height/2 - 20}px`;
-            floatEl.style.opacity = '0.95';
-            floatEl.style.transform = 'translateY(-6px) scale(1.02)';
+            // apply transform translate3d for GPU-accelerated motion
+            floatEl.style.transform = `translate3d(${dx}px, ${dy}px, 0) translateY(-6px) scale(1.02)`;
+            floatEl.style.opacity = '0.98';
         });
 
-        setTimeout(() => {
+        let cleaned = false;
+        function finish() {
+            if (cleaned) return; cleaned = true;
             if (floatEl.parentNode) floatEl.remove();
             setBoard(b => applyMove(b, move));
-            if (switchTurn) setTurn('ai');
-        }, 420);
+            if (nextTurn) setTurn(nextTurn);
+            resolve();
+        }
+
+        // prefer transitionend but fallback to timeout
+        const toMs = dur + 40;
+        const onEnd = (e) => { finish(); };
+        floatEl.addEventListener('transitionend', onEnd, { once: true });
+        setTimeout(() => finish(), toMs + 80);
     }
 
     function reset() { setBoard(initialBoard()); setSelected(null); setMoves([]); setTargets([]); setTurn('player'); setStatus(null); }
