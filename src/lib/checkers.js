@@ -45,10 +45,10 @@ export function getMoves(board, isPlayer = true, forceCapture = true) {
         const v = board[r][c];
         if (v === 0 || Math.sign(v) !== Math.sign(me)) continue;
         const isKing = Math.abs(v) === 2;
-        const dirs = isKing ? [[1,1],[1,-1],[-1,1],[-1,-1]] : (me === 1 ? [[-1,1],[-1,-1]] : [[1,1],[1,-1]]);
-        for (const [dr,dc] of dirs) {
-            const cap = tryCapture(r,c,dr,dc, null, board, [r,c], []);
-            if (cap) captures.push({ from: [r,c], to: cap.to, captures: cap.captures });
+        const dirs = isKing ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] : (me === 1 ? [[-1, 1], [-1, -1]] : [[1, 1], [1, -1]]);
+        for (const [dr, dc] of dirs) {
+            const cap = tryCapture(r, c, dr, dc, null, board, [r, c], []);
+            if (cap) captures.push({ from: [r, c], to: cap.to, captures: cap.captures });
         }
     }
 
@@ -59,11 +59,11 @@ export function getMoves(board, isPlayer = true, forceCapture = true) {
         const v = board[r][c];
         if (v === 0 || Math.sign(v) !== Math.sign(me)) continue;
         const isKing = Math.abs(v) === 2;
-        const dirs = isKing ? [[1,1],[1,-1],[-1,1],[-1,-1]] : (me === 1 ? [[-1,1],[-1,-1]] : [[1,1],[1,-1]]);
-        for (const [dr,dc] of dirs) {
+        const dirs = isKing ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] : (me === 1 ? [[-1, 1], [-1, -1]] : [[1, 1], [1, -1]]);
+        for (const [dr, dc] of dirs) {
             const nr = r + dr, nc = c + dc;
-            if (!inBounds(nr,nc)) continue;
-            if (board[nr][nc] === 0) moves.push({ from: [r,c], to: [nr,nc], captures: [] });
+            if (!inBounds(nr, nc)) continue;
+            if (board[nr][nc] === 0) moves.push({ from: [r, c], to: [nr, nc], captures: [] });
         }
     }
     // if forceCapture was true and captures existed we'd have returned above.
@@ -73,12 +73,12 @@ export function getMoves(board, isPlayer = true, forceCapture = true) {
 
 export function applyMove(board, move) {
     const b = cloneBoard(board);
-    const [fr,fc] = move.from; const [tr,tc] = move.to;
+    const [fr, fc] = move.from; const [tr, tc] = move.to;
     const v = b[fr][fc];
     b[fr][fc] = 0;
     b[tr][tc] = v;
     if (move.captures && move.captures.length) {
-        for (const [cr,cc] of move.captures) b[cr][cc] = 0;
+        for (const [cr, cc] of move.captures) b[cr][cc] = 0;
     }
     // kinging
     if (v === 1 && tr === 0) b[tr][tc] = 2;
@@ -108,7 +108,7 @@ export function aiChoose(board) {
         const tr = m.to[0];
         return { m, score: tr };
     });
-    scored.sort((a,b) => b.score - a.score);
+    scored.sort((a, b) => b.score - a.score);
     // pick among top 3
     const top = scored.slice(0, Math.max(1, Math.min(3, scored.length)));
     return top[Math.floor(Math.random() * top.length)].m;

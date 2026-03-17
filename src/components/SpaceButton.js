@@ -119,7 +119,7 @@ export default function SpaceButton({ children, className = '', variant = 'fille
             // animate using CSS transitions
             setTimeout(() => {
                 svg.style.transition = `transform ${dur}ms cubic-bezier(.1,.9,.2,1), opacity ${dur}ms ease`;
-                svg.style.transform = `translate(${dx}px, ${dy}px) translate(-50%,-50%) rotate(${rand(-120,120)}deg) scale(${rand(0.6, 1.6)})`;
+                svg.style.transform = `translate(${dx}px, ${dy}px) translate(-50%,-50%) rotate(${rand(-120, 120)}deg) scale(${rand(0.6, 1.6)})`;
                 svg.style.opacity = '0';
             }, 16);
 
@@ -147,7 +147,7 @@ export default function SpaceButton({ children, className = '', variant = 'fille
                 svg.style.transform = 'translate(-50%,-50%)';
 
                 const g = document.createElementNS(svgNS, 'g');
-                const gradId = `sp-gn-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+                const gradId = `sp-gn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
                 const defs = document.createElementNS(svgNS, 'defs');
                 const radial = document.createElementNS(svgNS, 'radialGradient');
                 radial.setAttribute('id', gradId);
@@ -160,7 +160,7 @@ export default function SpaceButton({ children, className = '', variant = 'fille
                 svg.appendChild(defs);
 
                 const circ = document.createElementNS(svgNS, 'circle');
-                circ.setAttribute('cx', String(size/2)); circ.setAttribute('cy', String(size/2)); circ.setAttribute('r', String(size/2));
+                circ.setAttribute('cx', String(size / 2)); circ.setAttribute('cy', String(size / 2)); circ.setAttribute('r', String(size / 2));
                 circ.setAttribute('fill', `url(#${gradId})`);
                 svg.appendChild(circ);
                 document.body.appendChild(svg);
@@ -173,9 +173,9 @@ export default function SpaceButton({ children, className = '', variant = 'fille
 
                 setTimeout(() => {
                     svg.style.transition = `transform ${dur}ms cubic-bezier(.2,.8,.2,1), opacity ${dur}ms ease`;
-                    svg.style.transform = `translate(${dx}px, ${dy}px) translate(-50%,-50%) scale(${rand(0.8,1.2)})`;
+                    svg.style.transform = `translate(${dx}px, ${dy}px) translate(-50%,-50%) scale(${rand(0.8, 1.2)})`;
                     svg.style.opacity = '0';
-                }, 16 + Math.random()*120);
+                }, 16 + Math.random() * 120);
 
                 const removeId = setTimeout(() => {
                     if (svg.parentNode) svg.remove();
@@ -187,7 +187,7 @@ export default function SpaceButton({ children, className = '', variant = 'fille
 
     function handleClick(e) {
         // remove lingering stars created by previous clicks
-        try { document.querySelectorAll('svg[data-space-star]').forEach(el => el.remove()); } catch (err) {}
+        try { document.querySelectorAll('svg[data-space-star]').forEach(el => el.remove()); } catch (err) { }
         createBodyStars(e);
         if (rest.onClick) rest.onClick(e);
     }
