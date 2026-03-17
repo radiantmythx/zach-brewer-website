@@ -1,12 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import RainbowButton from '../components/RainbowButton';
-import SpaceButton from '../components/SpaceButton';
+import ThemeButton from '../components/themes/ThemeButton';
 import RainbowPanel from '../components/RainbowPanel';
 import SpacePanel from '../components/SpacePanel';
-import RainbowResetButton from '../components/RainbowResetButton';
-import ThemeButton from '../components/themes/ThemeButton';
 import ThemePanel from '../components/themes/ThemePanel';
 import ThemeCard from '../components/themes/ThemeCard';
 
@@ -23,8 +20,8 @@ export default function Components() {
                     <div>
                         <h4 className="font-medium">Buttons</h4>
                         <div className="mt-3 flex items-center gap-3">
-                            <RainbowButton>Filled</RainbowButton>
-                            <RainbowResetButton>Border</RainbowResetButton>
+                            <ThemeButton theme="rainbow">Filled</ThemeButton>
+                            <ThemeButton theme="rainbow" variant="border">Border</ThemeButton>
                             <ThemeButton theme="rainbow" variant="border" textRainbow>Text</ThemeButton>
                         </div>
                     </div>
@@ -48,8 +45,8 @@ export default function Components() {
                     <div>
                         <h4 className="font-medium">Buttons</h4>
                         <div className="mt-3 flex items-center gap-3">
-                            <SpaceButton>Filled</SpaceButton>
-                            <SpaceButton variant="border">Border</SpaceButton>
+                            <ThemeButton theme="space">Filled</ThemeButton>
+                            <ThemeButton theme="space" variant="border">Border</ThemeButton>
                         </div>
                     </div>
 
