@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import themePresets from './themes/themePresets';
 
 function rand(min, max) {
     return Math.random() * (max - min) + min;
@@ -192,15 +193,105 @@ export default function SpaceButton({ children, className = '', variant = 'fille
         if (rest.onClick) rest.onClick(e);
     }
 
+    const spaceColors = (themePresets && themePresets.space && themePresets.space.baseColors) || ['#6fc3ff', '#0b2b4a', '#0f172a'];
+
+    const ringWidth = 1; // px
+
     const outerStyle = variant === 'border'
         ? {
-            padding: 1,
+            padding: `${ringWidth}px`,
             borderRadius: '0.5rem',
-            background: 'conic-gradient(from 120deg, #2a2d7b, #5b21b6, #0ea5a4, #2a2d7b)',
+            background: 'transparent',
             WebkitTapHighlightColor: 'transparent',
             boxShadow: '0 6px 20px rgba(30,41,59,0.08)'
         }
         : { borderRadius: '0.5rem' };
+
+    const svgRingRef = useRef(null);
+
+    useEffect(() => {
+        if (variant !== 'border' || !ref.current) return;
+        let raf = null;
+
+        function step() {
+            if (!ref.current) return;
+            const rect = ref.current.getBoundingClientRect();
+            let svg = svgRingRef.current;
+            const id = `sp-ring-${String(ref.current ? ref.current.dataset.spRingId : '') || '0'}`;
+            if (!svg) {
+                svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('aria-hidden', 'true');
+                svg.style.position = 'absolute';
+                svg.style.left = '0';
+                svg.style.top = '0';
+                svg.style.width = '100%';
+                svg.style.height = '100%';
+                svg.style.pointerEvents = 'none';
+                svg.style.zIndex = '0';
+                svgRingRef.current = svg;
+                ref.current.insertBefore(svg, ref.current.firstChild);
+            }
+
+            const w = Math.max(1, Math.round(rect.width));
+            const h = Math.max(1, Math.round(rect.height));
+            svg.setAttribute('width', String(w));
+            svg.setAttribute('height', String(h));
+            svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+            let grad = svg.querySelector('defs > linearGradient');
+            if (!grad) {
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                grad.setAttribute('id', id + '-grad');
+                grad.setAttribute('x1', '0%');
+                grad.setAttribute('y1', '0%');
+                grad.setAttribute('x2', '100%');
+                grad.setAttribute('y2', '0%');
+                defs.appendChild(grad);
+                svg.appendChild(defs);
+            }
+
+            while (grad.firstChild) grad.removeChild(grad.firstChild);
+            spaceColors.forEach((c, i) => {
+                const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop.setAttribute('offset', `${(i / (spaceColors.length - 1)) * 100}%`);
+                stop.setAttribute('stop-color', c);
+                grad.appendChild(stop);
+            });
+
+            let rectEl = svg.querySelector('rect.sp-ring');
+            if (!rectEl) {
+                rectEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rectEl.classList.add('sp-ring');
+                rectEl.setAttribute('fill', 'none');
+                rectEl.setAttribute('stroke-linecap', 'round');
+                rectEl.setAttribute('stroke-linejoin', 'round');
+                svg.appendChild(rectEl);
+            }
+
+            const strokeW = Math.max(1, ringWidth);
+            const inset = strokeW / 2;
+            const rx = Math.max(0, Math.min(12, parseFloat(window.getComputedStyle(ref.current).borderRadius) || 8));
+            rectEl.setAttribute('x', String(inset));
+            rectEl.setAttribute('y', String(inset));
+            rectEl.setAttribute('width', String(Math.max(0, w - strokeW)));
+            rectEl.setAttribute('height', String(Math.max(0, h - strokeW)));
+            rectEl.setAttribute('rx', String(rx));
+            rectEl.setAttribute('ry', String(rx));
+            rectEl.setAttribute('stroke-width', String(strokeW));
+            rectEl.setAttribute('stroke', `url(#${id}-grad)`);
+
+            raf = requestAnimationFrame(step);
+        }
+
+        raf = requestAnimationFrame(step);
+        return () => {
+            cancelAnimationFrame(raf);
+            try {
+                if (svgRingRef.current && svgRingRef.current.parentNode) svgRingRef.current.remove();
+            } catch (err) { }
+        };
+    }, [variant, spaceColors]);
 
     const innerStyle = {
         display: 'inline-flex',
@@ -216,6 +307,11 @@ export default function SpaceButton({ children, className = '', variant = 'fille
         background: variant === 'border' ? 'transparent' : 'linear-gradient(180deg, rgba(15,23,42,0.95), rgba(3,7,18,1))',
         color: 'white'
     };
+
+    // Text style for `text` variant (space-colored text using background-clip)
+    const textStyle = variant === 'text'
+        ? { backgroundImage: `conic-gradient(from 120deg, ${spaceColors.join(',')})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
+        : { color: 'white' };
 
     return (
         <button
@@ -270,7 +366,7 @@ export default function SpaceButton({ children, className = '', variant = 'fille
                     }}
                 />
 
-                <span className="relative z-10 font-semibold" style={{ pointerEvents: 'none' }}>{children}</span>
+                <span className="relative z-10 font-semibold" style={{ pointerEvents: 'none', ...textStyle }}>{children}</span>
             </span>
         </button>
     );
