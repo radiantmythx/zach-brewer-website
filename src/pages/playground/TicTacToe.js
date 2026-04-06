@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import gsap from 'gsap';
 import RainbowPanel from '../../components/RainbowPanel';
 import RainbowResetButton from '../../components/RainbowResetButton';
 import { createEmptyBoard, checkWinner, aiMove, findWinningLine } from '../../lib/ticTacToe';
@@ -56,16 +58,20 @@ function SVGO({ id, winning }) {
 function Cell({ value, onClick, idx, uid, winning }) {
     const id = `g-${uid}-${idx}`;
     return (
-        <button
+        <motion.button
             onClick={onClick}
             onMouseDown={(e) => e.preventDefault()}
             aria-label={`cell-${idx}`}
             tabIndex={-1}
             style={{ userSelect: 'none' }}
+            initial={{ scale: 1 }}
+            whileTap={{ scale: 0.96 }}
+            whileHover={{ scale: value ? 1 : 1.03 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
             className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center bg-transparent p-0 m-0">
-            {value === 'X' && <SVGX id={id} winning={winning} />}
-            {value === 'O' && <SVGO id={id} winning={winning} />}
-        </button>
+            {value === 'X' && <motion.div key={id} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.28 }}><SVGX id={id} winning={winning} /></motion.div>}
+            {value === 'O' && <motion.div key={id} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.28 }}><SVGO id={id} winning={winning} /></motion.div>}
+        </motion.button>
     );
 }
 
@@ -137,6 +143,7 @@ export default function TicTacToe() {
     const gradient = 'conic-gradient(from 120deg, #ff007f, #ff8a00, #00fff6, #7a2cff, #ff007f)';
     const gameOver = Boolean(checkWinner(board));
 
+    const winLineRef = useRef();
     useEffect(() => {
         if (!winningLine) return;
         // compute center coords for first and last cell relative to boardRef
@@ -153,6 +160,19 @@ export default function TicTacToe() {
         const x2 = l.left + l.width / 2 - crect.left;
         const y2 = l.top + l.height / 2 - crect.top;
         setLineCoords({ x1, y1, x2, y2 });
+
+        // animate the winning line with GSAP for a snappy feel
+        requestAnimationFrame(() => {
+            const line = winLineRef.current;
+            if (!line) return;
+            // reset strokeDashoffset to full and animate to 0
+            const length = line.getTotalLength ? line.getTotalLength() : 1000;
+            line.style.strokeDasharray = length;
+            line.style.strokeDashoffset = length;
+            gsap.fromTo(line, { strokeDashoffset: length }, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.out' });
+            // subtle pulse glow
+            gsap.fromTo(line, { filter: 'drop-shadow(0 0 0 rgba(0,0,0,0))' }, { filter: 'drop-shadow(0 14px 36px rgba(122,44,255,0.32))', yoyo: true, repeat: 1, duration: 0.6, ease: 'sine.inOut' });
+        });
     }, [winningLine]);
 
     return (
@@ -197,8 +217,7 @@ export default function TicTacToe() {
                                         <stop offset="100%" stopColor="#7a2cff" />
                                     </linearGradient>
                                 </defs>
-                                <line x1={lineCoords.x1} y1={lineCoords.y1} x2={lineCoords.x2} y2={lineCoords.y2} stroke="url(#winGrad)" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.6))', strokeDasharray: 1000, strokeDashoffset: 1000, animation: 'drawLine 700ms ease forwards' }} />
-                                <style>{`@keyframes drawLine { to { stroke-dashoffset: 0; } }`}</style>
+                                <line ref={winLineRef} x1={lineCoords.x1} y1={lineCoords.y1} x2={lineCoords.x2} y2={lineCoords.y2} stroke="url(#winGrad)" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.6))' }} />
                             </svg>
                         )}
                     </div>

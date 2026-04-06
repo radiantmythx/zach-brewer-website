@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import gsap from 'gsap';
 import { initialBoard, getMoves, applyMove, aiChoose, checkWinner } from '../../lib/checkers';
 import SpacePanel from '../../components/SpacePanel';
 
@@ -59,15 +61,6 @@ export default function Checkers() {
     const squaresRef = useRef({});
     const containerRef = useRef();
 
-    // ensure pulse keyframes exist
-    useEffect(() => {
-        if (document.getElementById('checkers-pulse-style')) return;
-        const s = document.createElement('style');
-        s.id = 'checkers-pulse-style';
-        s.innerHTML = `@keyframes checkers-pulse { 0% { transform: translateY(0) scale(1); box-shadow: 0 6px 18px rgba(0,0,0,0.45); } 50% { transform: translateY(-6px) scale(1.03); box-shadow: 0 10px 26px rgba(0,0,0,0.55); } 100% { transform: translateY(0) scale(1); box-shadow: 0 6px 18px rgba(0,0,0,0.45); } }`;
-        document.head.appendChild(s);
-    }, []);
-
     useEffect(() => {
         setStatus(checkWinner(board));
         if (turn === 'ai' && !status) {
@@ -75,14 +68,9 @@ export default function Checkers() {
             setTimeout(() => {
                 const move = aiChoose(board);
                 if (move) {
-                    // animate AI move and then set turn back to player
-                    animateAndApply(move, 'player').then(() => {
-                        aiThinking.current = false;
-                    });
-                } else {
-                    aiThinking.current = false;
-                }
-            }, 200);
+                    animateAndApply(move, 'player').then(() => { aiThinking.current = false; });
+                } else aiThinking.current = false;
+            }, 220);
         }
     }, [turn, board, status]);
 
@@ -92,7 +80,6 @@ export default function Checkers() {
         const v = board[r][c];
         if (v > 0) {
             setSelected([r, c]);
-            // don't force captures for player: pass forceCapture=false
             const ava = getMoves(board, true, false).filter(m => m.from[0] === r && m.from[1] === c);
             setMoves(getMoves(board, true, false));
             setTargets(ava.map(m => `${m.to[0]}-${m.to[1]}`));
@@ -102,7 +89,6 @@ export default function Checkers() {
             const available = getMoves(board, true, false);
             const mv = available.find(m => m.from[0] === selected[0] && m.from[1] === selected[1] && m.to[0] === r && m.to[1] === c);
             if (mv) {
-                // animate then apply; pass 'ai' as the next turn string
                 animateAndApply(mv, 'ai');
                 setSelected(null);
                 setMoves([]);
@@ -122,7 +108,6 @@ export default function Checkers() {
             const fromRect = getSquareRect(from[0], from[1]);
             const toRect = getSquareRect(to[0], to[1]);
             if (!fromRect || !toRect) {
-                // fallback: immediate
                 setBoard(b => applyMove(b, move));
                 if (nextTurn) setTurn(nextTurn);
                 resolve();
@@ -130,9 +115,6 @@ export default function Checkers() {
             }
 
             const pieceVal = board[from[0]][from[1]];
-            // try to hide the original piece to sell the illusion while the floating
-            // clone animates. We look for a child element roughly the piece size
-            // inside the square wrapper and hide it.
             const originEl = squaresRef.current[`${from[0]}-${from[1]}`];
             let originPieceEl = null;
             if (originEl) {
@@ -144,11 +126,9 @@ export default function Checkers() {
                 if (originPieceEl) originPieceEl.style.visibility = 'hidden';
             }
 
-            // prepare capture element animations (if any)
             const captureEls = (move.captures || []).map(([cr, cc]) => {
                 const node = squaresRef.current[`${cr}-${cc}`];
                 if (!node) return null;
-                // find a child that looks like the piece element
                 const kids = node.getElementsByTagName('*');
                 for (let i = 0; i < kids.length; i++) {
                     const el = kids[i];
@@ -156,13 +136,13 @@ export default function Checkers() {
                 }
                 return null;
             }).filter(Boolean);
+
             const floatEl = document.createElement('div');
             floatEl.style.position = 'fixed';
-            // position using left/top but we'll animate via transform for high-framerate
             const startLeft = fromRect.left + fromRect.width / 2 - 20;
             const startTop = fromRect.top + fromRect.height / 2 - 20;
-            const dx = (toRect.left + toRect.width / 2 - 20) - startLeft;
-            const dy = (toRect.top + toRect.height / 2 - 20) - startTop;
+            const endLeft = toRect.left + toRect.width / 2 - 20;
+            const endTop = toRect.top + toRect.height / 2 - 20;
             floatEl.style.left = `${startLeft}px`;
             floatEl.style.top = `${startTop}px`;
             floatEl.style.width = '40px';
@@ -172,79 +152,52 @@ export default function Checkers() {
             floatEl.style.display = 'flex';
             floatEl.style.alignItems = 'center';
             floatEl.style.justifyContent = 'center';
-            const dur = 340;
-            floatEl.style.transition = `transform ${dur}ms cubic-bezier(.2,.9,.2,1), opacity ${dur}ms ease`;
             floatEl.style.willChange = 'transform, opacity';
-            if (pieceVal > 0) {
-                floatEl.style.background = 'radial-gradient(circle at 30% 30%, #4b5563, #111827)';
-            } else {
-                floatEl.style.background = 'radial-gradient(circle at 30% 30%, #ffb36b, #f97316)';
-            }
+            floatEl.style.transform = 'translate3d(0,0,0)';
+            if (pieceVal > 0) floatEl.style.background = 'radial-gradient(circle at 30% 30%, #4b5563, #111827)';
+            else floatEl.style.background = 'radial-gradient(circle at 30% 30%, #ffb36b, #f97316)';
             floatEl.textContent = Math.abs(pieceVal) === 2 ? 'K' : '';
             document.body.appendChild(floatEl);
 
-            // small delay to allow paint, then animate with a "jump" by adding
-            // a larger negative translateY and scale to sell the leap.
-            requestAnimationFrame(() => {
-                floatEl.style.transform = `translate3d(${dx}px, ${dy}px, 0) translateY(-18px) scale(1.12)`;
-                floatEl.style.opacity = '0.98';
+            // animate with GSAP
+            const dx = endLeft - startLeft;
+            const dy = endTop - startTop;
+            const tl = gsap.timeline({
+                onComplete: async () => {
+                    if (floatEl.parentNode) floatEl.remove();
+                    try { await Promise.all(capturePromises || []); } catch (e) { }
+                    setBoard(b => applyMove(b, move));
+                    if (nextTurn) setTurn(nextTurn);
+                    if (originPieceEl) originPieceEl.style.visibility = '';
+                    resolve();
+                }
             });
 
-            let cleaned = false;
-            async function finish() {
-                if (cleaned) return; cleaned = true;
-                if (floatEl.parentNode) floatEl.remove();
-                // wait for any capture animations to complete before applying
-                // the logical board change so the death animation is visible.
-                try { await Promise.all(capturePromises || []); } catch (e) { /* ignore */ }
-                // apply move to the board (this will re-render and replace the
-                // hidden origin piece). Then switch turn if provided.
-                setBoard(b => applyMove(b, move));
-                if (nextTurn) setTurn(nextTurn);
-                // restore visibility in case the DOM didn't re-render for some
-                // reason (defensive).
-                if (originPieceEl) originPieceEl.style.visibility = '';
-                resolve();
-            }
-
-            // prefer transitionend but fallback to timeout
-            const toMs = dur + 40;
-
-            // start capture animations in parallel and await them before applying
-            // the board update. We return a promise that resolves after the
-            // capture animation completes (or immediately if none).
+            // capture animations
             const capturePromises = captureEls.map((el) => new Promise((res) => {
-                try {
-                    el.style.transition = `transform ${Math.round(dur * 0.7)}ms cubic-bezier(.2,.9,.2,1), opacity ${Math.round(dur * 0.7)}ms ease`;
-                    // animate outward and fade but do NOT remove the node; the
-                    // logical board update will remove it after the animation.
-                    el.style.transform = 'scale(1.4) translateY(-10px) rotate(8deg)';
-                    el.style.opacity = '0';
-                } catch (e) { /* defensive */ }
-                setTimeout(() => {
-                    // leave DOM removal to React; just resolve after animation
-                    res();
-                }, Math.max(80, Math.round(dur * 0.8)));
+                gsap.to(el, { scale: 1.4, y: -10, rotation: 8, opacity: 0, duration: 0.26, ease: 'power1.in', onComplete: res });
             }));
 
-            const onEnd = (e) => { finish(); };
-            floatEl.addEventListener('transitionend', onEnd, { once: true });
-            setTimeout(() => finish(), toMs + 80);
+            tl.to(floatEl, { x: dx, y: dy, duration: 0.36, ease: 'power2.out' }).to(floatEl, { y: `-=${6}`, duration: 0.12, yoyo: true, repeat: 1 }, 0);
         });
     }
 
     function reset() { setBoard(initialBoard()); setSelected(null); setMoves([]); setTargets([]); setTurn('player'); setStatus(null); }
 
+    const size = 56;
+
     return (
         <div>
             <h2 className="text-2xl font-semibold">Checkers</h2>
-            <p className="text-sm text-gray-600">Basic checkers with a simple AI (captures preferred).</p>
+            <p className="text-sm text-gray-600">Basic checkers with GSAP + Framer Motion</p>
             <div className="mt-4 flex gap-6">
                 <SpacePanel className="flex-shrink-0">
                     <div ref={containerRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(8,64px)', gap: 8, padding: 8, borderRadius: 12, userSelect: 'none' }}>
                         {board.map((row, r) => row.map((v, c) => (
-                            <div key={`${r}-${c}`} onMouseDown={(e) => e.preventDefault()} onClick={() => handleSelect(r, c)} style={{ position: 'relative' }} ref={el => squaresRef.current[`${r}-${c}`] = el}>
-                                <Square r={r} c={c} value={v} selected={selected && selected[0] === r && selected[1] === c} isTarget={targets.includes(`${r}-${c}`)} pulse={turn === 'player'} />
+                            <div key={`${r}-${c}`} onMouseDown={(e) => e.preventDefault()} style={{ position: 'relative' }} ref={el => squaresRef.current[`${r}-${c}`] = el}>
+                                <motion.div whileTap={{ scale: 0.98 }} onClick={() => handleSelect(r, c)}>
+                                    <Square r={r} c={c} value={v} selected={selected && selected[0] === r && selected[1] === c} isTarget={targets.includes(`${r}-${c}`)} />
+                                </motion.div>
                             </div>
                         )))}
                     </div>

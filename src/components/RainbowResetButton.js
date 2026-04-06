@@ -289,13 +289,17 @@ export default function RainbowResetButton({ children, className = '', pulses = 
 
     const textColor = `rgba(255,255,255,${Math.min(1, Math.max(0, 0.95 - bgAlpha))})`;
     const hueShiftRender = Math.floor((tRef.current * 60) % 360);
+    // For the "reset/border" variant we always add a subtle dark outline
+    const outlineForBorder = { WebkitTextStroke: '0.6px rgba(0,0,0,0.72)', textShadow: '-1px -1px 0 rgba(0,0,0,0.45), 1px -1px 0 rgba(0,0,0,0.45), -1px 1px 0 rgba(0,0,0,0.45), 1px 1px 0 rgba(0,0,0,0.45)' };
+
     const textStyle = textRainbow
         ? {
             backgroundImage: `conic-gradient(from ${hueShiftRender}deg, ${baseColors.join(',')})`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
+            ...outlineForBorder
         }
-        : { color: textColor };
+        : { color: textColor, ...outlineForBorder };
 
     return (
         <button

@@ -1,11 +1,10 @@
 import React from 'react';
 import themePresets from './themePresets';
-import RainbowButton from '../RainbowButton';
-import RainbowResetButton from '../RainbowResetButton';
-import SpaceButton from '../SpaceButton';
+import RainbowButton from '../components/RainbowButton';
+import RainbowResetButton from '../components/RainbowResetButton';
+import SpaceButton from '../components/SpaceButton';
 
 export default function ThemeButton({ theme = 'rainbow', variant = 'filled', children, className = '', style = {}, textRainbow = false, ...rest }) {
-    // If there's a specialized component for a theme, delegate to it so behavior stays identical.
     if (theme === 'rainbow') {
         if (variant === 'border') {
             return (
@@ -22,7 +21,6 @@ export default function ThemeButton({ theme = 'rainbow', variant = 'filled', chi
     }
 
     if (theme === 'space') {
-        // SpaceButton supports variant='border' and other space-specific props like `novas`
         return (
             <SpaceButton {...rest} className={className} variant={variant}>
                 {children}
@@ -30,7 +28,6 @@ export default function ThemeButton({ theme = 'rainbow', variant = 'filled', chi
         );
     }
 
-    // Fallback: use simple themed styles from presets
     const t = themePresets[theme] || themePresets.rainbow;
     const ringWidth = 1;
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import ThemeButton from '../components/themes/ThemeButton';
+import ThemeButton from '../zTheme/ThemeButton';
 import RainbowPanel from '../components/RainbowPanel';
 import SpacePanel from '../components/SpacePanel';
-import ThemePanel from '../components/themes/ThemePanel';
-import ThemeCard from '../components/themes/ThemeCard';
+import ThemePanel from '../zTheme/ThemePanel';
+import ThemeCard from '../zTheme/ThemeCard';
 
 export default function Components() {
     return (

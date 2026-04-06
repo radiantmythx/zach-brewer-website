@@ -309,9 +309,16 @@ export default function SpaceButton({ children, className = '', variant = 'fille
     };
 
     // Text style for `text` variant (space-colored text using background-clip)
-    const textStyle = variant === 'text'
+    const textStyleBase = variant === 'text'
         ? { backgroundImage: `conic-gradient(from 120deg, ${spaceColors.join(',')})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
         : { color: 'white' };
+
+    // For border variant, always apply a subtle dark outline so text remains visible on light pages
+    const outlineWhenBorder = variant === 'border'
+        ? { WebkitTextStroke: '0.6px rgba(0,0,0,0.72)', textShadow: '-1px -1px 0 rgba(0,0,0,0.45), 1px -1px 0 rgba(0,0,0,0.45), -1px 1px 0 rgba(0,0,0,0.45), 1px 1px 0 rgba(0,0,0,0.45)' }
+        : {};
+
+    const textStyle = { ...textStyleBase, ...outlineWhenBorder };
 
     return (
         <button
